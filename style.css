@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Kustomisasi Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #9c1c24;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #7a151b;
+}
+
+/* Menghilangkan scrollbar bawaan browser saat digeser di HP */
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-none {
+    -ms-overflow-style: none;  /* IE dan Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Animasi Sensor Deteksi Kamera Wajah */
+@keyframes scan {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(120px);
+    }
+}
+
+.scanner-line {
+    animation: scan 2.5s infinite ease-in-out;
+}

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLIKJASA - Platform Lowongan Kerja & Jasa Terverifikasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="AppCoordinator.gantiHalaman('dashboard')">
+                        <span class="text-xl md:text-2xl font-extrabold text-[#9c1c24] tracking-wider flex items-center gap-2">
+                            <i data-lucide="briefcase" class="w-6 h-6 md:w-8 md:h-8 text-[#9c1c24]"></i> KLIKJASA
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div id="auth-guest" class="flex items-center gap-2">
+                        <button onclick="AppCoordinator.gantiHalaman('login')" class="text-xs md:text-sm font-semibold text-slate-700 hover:text-[#9c1c24] px-2.5 py-1.5 rounded-lg transition">Masuk</button>
+                        <button onclick="AppCoordinator.gantiHalaman('register')" class="bg-[#9c1c24] text-white text-xs md:text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-red-800 transition shadow-sm">Daftar</button>
+                    </div>
+                    <div id="auth-user" class="hidden flex items-center gap-3">
+                        <div id="kyc-badge-nav" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold"></div>
+                        <div class="relative group">
+                            <button class="flex items-center gap-2 focus:outline-none" id="user-menu-btn">
+                                <div class="w-8 h-8 rounded-full bg-red-100 text-[#9c1c24] flex items-center justify-center font-bold border border-red-200" id="user-avatar">U</div>
+                                <span class="hidden md:inline text-sm font-semibold text-slate-700" id="user-name-nav">Pengguna</span>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1 hidden group-hover:block z-50">
+                                <button onclick="AppCoordinator.gantiHalaman('profil')" class="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                    <i data-lucide="user" class="w-4 h-4"></i> Profil & Reputasi
+                                </button>
+                                <button onclick="AppCoordinator.gantiHalaman('kerjaanku')" class="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                    <i data-lucide="clipboard-list" class="w-4 h-4"></i> Kerjaanku
+                                </button>
+                                <hr class="border-slate-100 my-1">
+                                <button onclick="AuthModule.prosesLogout()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 font-semibold">
+                                    <i data-lucide="log-out" class="w-4 h-4"></i> Keluar Akun
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center overflow-x-auto whitespace-nowrap -mx-4 px-4 pb-2 md:pb-0 scrollbar-none md:overflow-x-visible md:whitespace-normal">
+                <div class="flex space-x-5 border-b border-slate-100 w-full md:border-none">
+                    <button onclick="AppCoordinator.gantiHalaman('dashboard')" class="nav-link text-slate-900 border-b-2 border-[#9c1c24] pb-2 md:py-2 text-xs md:text-sm font-medium flex items-center shrink-0 transition-colors" id="nav-dashboard">
+                        Dashboard Lowongan
+                    </button>
+                    <button onclick="AppCoordinator.gantiHalaman('tawarkan')" class="nav-link text-slate-500 hover:text-slate-700 pb-2 md:py-2 text-xs md:text-sm font-medium flex items-center shrink-0 transition-colors" id="nav-tawarkan">
+                        Tawarkan Kerja
+                    </button>
+                    <button onclick="AppCoordinator.gantiHalaman('ambil')" class="nav-link text-slate-500 hover:text-slate-700 pb-2 md:py-2 text-xs md:text-sm font-medium flex items-center shrink-0 transition-colors" id="nav-ambil">
+                        Ambil Kerja
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+        <div id="toast"
+            class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 transition-all transform translate-y-20 opacity-0 pointer-events-none">
+            <span id="toast-icon" class="text-emerald-400"><i data-lucide="info" class="w-5 h-5"></i></span>
+            <p id="toast-text" class="text-sm font-medium">Notifikasi</p>
+        </div>
+
+        <section id="page-dashboard" class="space-y-6">
+            <div
+                class="bg-gradient-to-r from-red-900 to-[#9c1c24] rounded-2xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-red-600/30 via-transparent to-transparent">
+                </div>
+                <div class="relative z-10 max-w-2xl space-y-4">
+                    <span
+                        class="bg-red-800 text-red-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Cari
+                        & Tawarkan Jasa Terpercaya</span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Cari Pekerjaan Terdekat atau Tawarkan
+                        Jasa dalam Hitungan Detik.</h1>
+                    <p class="text-red-100 text-sm sm:text-base font-light">Seluruh mitra di KLIKJASA wajib
+                        memverifikasi KTP & wajah menggunakan kecerdasan buatan (AI) untuk transaksi yang aman.</p>
+                </div>
+            </div>
+
+            <div
+                class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-end">
+                <div class="w-full md:w-1/3 space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Kata Kunci</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3.5 top-3 w-5 h-5 text-slate-400"></i>
+                        <input type="text" id="filter-search" oninput="JobTakingModule.jalankanFilter()"
+                            placeholder="Cari nama atau deskripsi pekerjaan..."
+                            class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm">
+                    </div>
+                </div>
+                <div class="w-full md:w-1/4 space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Kota</label>
+                    <select id="filter-city" onchange="JobTakingModule.jalankanFilter()"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm bg-white"></select>
+                </div>
+                <div class="w-full md:w-1/4 space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Kategori</label>
+                    <select id="filter-category" onchange="JobTakingModule.jalankanFilter()"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm bg-white"></select>
+                </div>
+                <div class="w-full md:w-1/6">
+                    <button onclick="JobTakingModule.resetFilter()"
+                        class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-slate-800">Lowongan Pekerjaan Terbaru</h2>
+                    <span class="text-xs font-semibold text-slate-500" id="total-jobs-count">Menampilkan 0
+                        pekerjaan</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm" id="jobs-container"></div>
+            </div>
+        </section>
+
+        <section id="page-login"
+            class="hidden max-w-md mx-auto my-12 bg-white p-8 rounded-2xl border border-slate-200 shadow-xl space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl font-bold text-slate-800">Masuk Akun</h2>
+                <p class="text-slate-500 text-sm">Gunakan <span class="font-bold">admin@klikjasa.com</span> (Sandi:
+                    <span class="font-bold">admin123</span>) untuk akses admin</p>
+            </div>
+            <form onsubmit="AuthModule.prosesLogin(event)" id="form-login" class="space-y-4">
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Email</label>
+                    <input type="email" id="login-email" required placeholder="nama@domain.com"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Kata Sandi</label>
+                    <input type="password" id="login-password" required placeholder="••••••••"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm">
+                </div>
+                <button type="submit"
+                    class="w-full bg-[#9c1c24] hover:bg-red-800 text-white font-bold py-3 rounded-xl shadow-lg transition">Masuk</button>
+            </form>
+            <div class="text-center text-sm text-slate-500">
+                Belum punya akun? <button onclick="AppCoordinator.gantiHalaman('register')"
+                    class="text-[#9c1c24] font-bold hover:underline">Daftar Sekarang</button>
+            </div>
+        </section>
+
+        <section id="page-register"
+            class="hidden max-w-md mx-auto my-12 bg-white p-8 rounded-2xl border border-slate-200 shadow-xl space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl font-bold text-slate-800">Buat Akun Baru</h2>
+                <p class="text-slate-500 text-sm">Mulai menawarkan atau mengambil pekerjaan sekarang</p>
+            </div>
+            <form onsubmit="AuthModule.prosesRegister(event)" id="form-login" class="space-y-4">
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Nama Lengkap</label>
+                    <input type="text" id="reg-name" required placeholder="Ketik nama lengkap Anda..."
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Email</label>
+                    <input type="email" id="reg-email" required placeholder="nama@domain.com"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Kata Sandi</label>
+                    <input type="password" id="reg-password" required placeholder="Minimal 6 karakter"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm">
+                </div>
+                <button type="submit"
+                    class="w-full bg-[#9c1c24] hover:bg-red-800 text-white font-bold py-3 rounded-xl shadow-lg transition">Buat
+                    Akun</button>
+            </form>
+            <div class="text-center text-sm text-slate-500">
+                Sudah punya akun? <button onclick="AppCoordinator.gantiHalaman('login')"
+                    class="text-[#9c1c24] font-bold hover:underline">Masuk</button>
+            </div>
+        </section>
+
+        <section id="page-admin" class="hidden space-y-8">
+            <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold flex items-center gap-2 text-red-500"><i data-lucide="shield-check"></i>
+                    Kontrol Panel Administrator</h2>
+                <p class="text-xs text-slate-400 mt-1">Akses eksklusif untuk memantau data aplikasi, mematikan lowongan
+                    bermasalah, dan mengelola pengguna.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 lg:col-span-1">
+                    <h3
+                        class="font-bold text-sm uppercase tracking-wider text-slate-700 border-b pb-2 flex items-center gap-1.5">
+                        <i data-lucide="users" class="w-4 h-4"></i> Daftar Pengguna (${AppState.users.length})
+                    </h3>
+                    <div id="admin-users-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-1"></div>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 lg:col-span-2">
+                    <h3
+                        class="font-bold text-sm uppercase tracking-wider text-slate-700 border-b pb-2 flex items-center gap-1.5">
+                        <i data-lucide="folder-management" class="w-4 h-4"></i> Moderasi Semua Lowongan Kerja
+                    </h3>
+                    <div id="admin-jobs-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-kyc"
+            class="hidden max-w-2xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-red-900 to-[#9c1c24] p-6 text-white">
+                <h2 class="text-xl font-bold flex items-center gap-2"><i data-lucide="shield-check" class="w-6 h-6"></i>
+                    Verifikasi Identitas Wajib (KYC)</h2>
+                <p class="text-red-100 text-xs mt-1">Harap verifikasikan KTP fisik dan wajah Anda menggunakan kecerdasan
+                    buatan (AI) KLIKJASA.</p>
+            </div>
+            <div class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider border-b pb-2">Data
+                            Kependudukan</h3>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">NIK KTP (16 Digit)</label>
+                            <input type="text" id="kyc-nik" maxlength="16" placeholder="32xxxxxxxxxxxxxx"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Nama Lengkap (Sesuai KTP)</label>
+                            <input type="text" id="kyc-name" placeholder="Nama lengkap asli..."
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Alamat Tinggal</label>
+                            <textarea id="kyc-address" rows="3" placeholder="Alamat jalan lengkap..."
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm"></textarea>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider border-b pb-2">Dokumentasi
+                            Kamera</h3>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Unggah Foto KTP</label>
+                            <div class="border-2 border-dashed border-slate-200 hover:border-[#9c1c24] transition rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer relative bg-slate-50"
+                                id="ktp-box">
+                                <i data-lucide="image-plus" class="w-8 h-8 text-slate-400" id="ktp-icon"></i>
+                                <span class="text-xs text-slate-500 mt-2 text-center" id="ktp-label">Tekan untuk unggah
+                                    berkas KTP</span>
+                                <input type="file" id="kyc-ktp-file" onchange="KYCModule.handleFileKtp(event)"
+                                    class="absolute inset-0 opacity-0 cursor-pointer">
+                                <img id="ktp-preview" class="hidden w-full h-28 object-cover rounded-lg">
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Deteksi Wajah Selfie</label>
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="w-32 h-32 rounded-full border-4 border-[#9c1c24] overflow-hidden relative bg-slate-900 flex items-center justify-center text-white"
+                                    id="selfie-camera-box">
+                                    <i data-lucide="user-check" class="w-10 h-10 text-slate-600"
+                                        id="camera-placeholder"></i>
+                                    <div class="absolute left-0 right-0 h-1 bg-red-500 scanner-line hidden"
+                                        id="scanner-line"></div>
+                                    <img id="selfie-preview" class="hidden w-full h-full object-cover">
+                                </div>
+                                <button type="button" onclick="KYCModule.mulaiSimulasiSelfie()"
+                                    class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-1.5"><i
+                                        data-lucide="camera" class="w-4 h-4"></i> Buka Kamera Selfie</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="ai-processor" class="hidden bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-3">
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-500 uppercase">
+                        <span>Pemrosesan Engine AI KLIKJASA</span>
+                        <span id="ai-status" class="text-yellow-600 animate-pulse">Memproses...</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                        <div class="bg-[#9c1c24] h-2 rounded-full transition-all duration-1000" style="width: 10%"
+                            id="ai-progress"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-xs font-semibold text-slate-600">
+                        <div class="flex items-center gap-1.5"><i data-lucide="check-circle"
+                                class="w-4 h-4 text-slate-300" id="ai-ocr-icon"></i> Verifikasi OCR KTP</div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="check-circle"
+                                class="w-4 h-4 text-slate-300" id="ai-face-icon"></i> Pencocokan Wajah</div>
+                    </div>
+                </div>
+                <button onclick="KYCModule.prosesVerifikasiAI()"
+                    class="w-full bg-[#9c1c24] hover:bg-red-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2"><i
+                        data-lucide="shield-alert" class="w-5 h-5"></i> Kirim & Verifikasi AI</button>
+            </div>
+        </section>
+
+        <section id="page-tawarkan"
+            class="hidden max-w-3xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-red-900 to-[#9c1c24] p-6 text-white">
+                <h2 class="text-xl font-bold flex items-center gap-2"><i data-lucide="edit-3" class="w-6 h-6"></i> Buat
+                    Penawaran Lowongan Baru</h2>
+                <p class="text-red-100 text-xs mt-1">Harap rincikan jenis tugas, alamat penempatan kerja, serta detail
+                    budget Anda.</p>
+            </div>
+            <form onsubmit="JobOfferingModule.buatPekerjaanBaru(event)" class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Nama Pemilik Lowongan
+                                (Owner)</label>
+                            <input type="text" id="job-owner-name" readonly
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-500 focus:outline-none">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Kategori Utama Jasa</label>
+                            <select id="job-category" required onchange="JobOfferingModule.updateSubCategoryDropdown()"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm bg-white"></select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Sub-Kategori Jasa</label>
+                            <select id="job-subcategory" required
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm bg-white"></select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Judul Lowongan Pekerjaan</label>
+                            <input type="text" id="job-title" required placeholder="Contoh: Sopir Pribadi Harian"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Batas Akhir (Deadline)</label>
+                            <input type="datetime-local" id="job-deadline" required
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm">
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Pilih Kota Penempatan</label>
+                            <select id="job-city" required
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm bg-white"></select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Alamat Rinci & Koordinat
+                                GPS</label>
+                            <textarea id="job-address" required rows="3" placeholder="Tuliskan alamat lengkap lokasi..."
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm"></textarea>
+                            <div
+                                class="bg-slate-100 p-2 text-[10px] font-mono text-slate-500 rounded-lg flex justify-between">
+                                <span>Lat: -6.2088</span><span>Lng: 106.8456 (Simulasi GPS)</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                            <div class="space-y-1">
+                                <label class="text-xs font-bold text-slate-500 uppercase">Budget Kotor</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-2.5 font-bold text-slate-400 text-sm">Rp</span>
+                                    <input type="number" id="budget-gross" required
+                                        oninput="JobOfferingModule.hitungBudgetBersih()" placeholder="Nilai Budget..."
+                                        class="w-full pl-11 pr-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm font-semibold">
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-500">
+                                <span>Komisi Aplikasi (10%)</span><span class="font-semibold text-red-600"
+                                    id="fee-platform">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between text-sm font-bold border-t pt-2 text-slate-800">
+                                <span>Budget Bersih (Pekerja)</span><span class="text-emerald-600" id="budget-net">Rp
+                                    0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Deskripsi / Panduan Tugas</label>
+                    <textarea id="job-article" required rows="4" placeholder="Sebutkan langkah pengerjaan terperinci..."
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#9c1c24] text-sm"></textarea>
+                </div>
+                <button type="submit"
+                    class="w-full bg-[#9c1c24] hover:bg-red-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition">Posting
+                    Pekerjaan Sekarang</button>
+            </form>
+        </section>
+
+        <section id="page-ambil" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Ruang Ambil Jasa</h2>
+                    <p class="text-sm text-slate-500">Ambil tugas terbuka di dekat Anda untuk menambah penghasilan
+                        harian.</p>
+                </div>
+                <div
+                    class="bg-red-50 border border-red-100 p-3 rounded-xl flex items-center gap-2 text-xs font-semibold text-[#9c1c24]">
+                    <i data-lucide="map-pin" class="w-5 h-5 text-[#9c1c24] animate-bounce"></i>
+                    <div>
+                        <span>Sistem Radar GPS Aktif</span>
+                        <p class="text-[9px] text-slate-500 font-normal">Memindai tugas aktif (Radius 5 Km)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-4" id="worker-jobs-container"></div>
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center gap-2 border-b pb-2">
+                            <i data-lucide="zap" class="w-5 h-5 text-amber-500"></i>
+                            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Metode Concurrency
+                                Lock</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 leading-relaxed">Simulasi ini memicu aksi dari dua pekerja
+                            virtual yang mencoba menekan tombol "Ambil" secara bersamaan pada tugas yang sama untuk
+                            mencegah <i>race condition</i>.</p>
+                        <button onclick="JobTakingModule.simulasikanTabrakanTransaksi()"
+                            class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-1.5"><i
+                                data-lucide="play" class="w-4 h-4"></i> Simulasikan Race Condition</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-kerjaanku" class="hidden space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800">Aktivitas Pekerjaan Saya</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3
+                        class="text-sm font-bold text-slate-800 border-b pb-2 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="send" class="w-5 h-5 text-[#9c1c24]"></i> Lowongan yang Saya Tawarkan</h3>
+                    <div class="space-y-4" id="my-offers-container"></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3
+                        class="text-sm font-bold text-slate-800 border-b pb-2 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="clipboard-list" class="w-5 h-5 text-emerald-600"></i> Pekerjaan yang Saya Ambil
+                    </h3>
+                    <div class="space-y-4" id="my-taken-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-profil" class="hidden max-w-4xl mx-auto space-y-6">
+            <div
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-20 h-20 rounded-full bg-red-100 border border-red-200 flex items-center justify-center font-bold text-3xl text-[#9c1c24]"
+                        id="profile-avatar-large">U</div>
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-xl font-bold text-slate-800" id="profile-name">Mitra KLIKJASA</h2>
+                            <span id="profile-badge"
+                                class="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold"></span>
+                        </div>
+                        <p class="text-sm text-slate-500" id="profile-email"></p>
+                        <p class="text-xs text-slate-400" id="profile-nik"></p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-50 border border-slate-100 p-4 rounded-xl text-center">
+                        <span class="block text-2xl font-extrabold text-slate-800" id="stat-completed-jobs">0</span>
+                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Tugas Selesai</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-100 p-4 rounded-xl text-center">
+                        <span class="block text-2xl font-extrabold text-amber-500" id="stat-average-rating">0.0</span>
+                        <div class="flex items-center justify-center gap-0.5 text-amber-400 mt-1" id="stat-stars"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+                <h3
+                    class="text-sm font-bold text-slate-800 border-b pb-2 uppercase tracking-wider flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-5 h-5 text-slate-600"></i> Histori Feedback & Reputasi</h3>
+                <div class="space-y-4 divide-y divide-slate-100 text-sm" id="reviews-feed-container"></div>
+            </div>
+        </section>
+
+        <div id="rating-modal"
+            class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+            <div
+                class="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div class="bg-slate-900 p-4 text-white flex justify-between items-center">
+                    <h3 class="font-bold text-sm uppercase tracking-wider">Berikan Penilaian Review</h3>
+                    <button onclick="ReviewModule.tutupModalRating()" class="text-slate-400 hover:text-white"><i
+                            data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <p class="text-xs text-slate-500">Berikan feedback objektif kepada pekerja demi menjaga integritas
+                        ekosistem KLIKJASA.</p>
+                    <div class="flex justify-center gap-2 py-2">
+                        <button onclick="ReviewModule.setBintang(1)"
+                            class="star-btn text-slate-300 hover:scale-110 transition"><i data-lucide="star"
+                                class="w-8 h-8"></i></button>
+                        <button onclick="ReviewModule.setBintang(2)"
+                            class="star-btn text-slate-300 hover:scale-110 transition"><i data-lucide="star"
+                                class="w-8 h-8"></i></button>
+                        <button onclick="ReviewModule.setBintang(3)"
+                            class="star-btn text-slate-300 hover:scale-110 transition"><i data-lucide="star"
+                                class="w-8 h-8"></i></button>
+                        <button onclick="ReviewModule.setBintang(4)"
+                            class="star-btn text-slate-300 hover:scale-110 transition"><i data-lucide="star"
+                                class="w-8 h-8"></i></button>
+                        <button onclick="ReviewModule.setBintang(5)"
+                            class="star-btn text-slate-300 hover:scale-110 transition"><i data-lucide="star"
+                                class="w-8 h-8"></i></button>
+                    </div>
+                    <textarea id="modal-review-text" rows="3" placeholder="Tuliskan testimoni hasil kerja..."
+                        class="w-full text-sm p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#9c1c24]"></textarea>
+                    <button onclick="ReviewModule.kirimReviewPekerjaan()"
+                        class="w-full bg-[#9c1c24] text-white font-bold py-2.5 rounded-xl hover:bg-red-800 transition shadow-md">Simpan
+                        Feedback</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 font-semibold mt-auto">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© 2026 KLIKJASA - PT. Bakti Negara Berkah. Seluruh hak cipta dilindungi undang-undang.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
